@@ -232,7 +232,7 @@ function escapeXml(text: string): string {
 }
 
 function createSvgBackground(_config: AppConfig, _canvasHeight: number): string {
-  return `<rect width="100%" height="100%" fill="#f2f4f6"/>`;
+  return `<rect width="100%" height="100%" fill="#f8f9fa"/>`;
 }
 
 function createDecorativeQuote(_config: AppConfig): string {
@@ -241,16 +241,15 @@ function createDecorativeQuote(_config: AppConfig): string {
 
 function createDecorativeLines(
   config: AppConfig,
-  maxTextWidth: number,
-  quoteStartY: number,
-  quoteEndY: number
+  _maxTextWidth: number,
+  _quoteStartY: number,
+  _quoteEndY: number
 ): string {
-  const pad = 20;
-  const x = config.canvas.margin - pad;
-  const y = quoteStartY - config.font.sizes.quote.base * 0.3 - pad;
-  const w = maxTextWidth + pad * 2;
-  const h = (quoteEndY - quoteStartY) + config.font.sizes.quote.base * 0.3 + pad * 2;
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${config.colors.accent}" stroke-width="3" rx="8"/>`;
+  const t = 6; // border thickness
+  const r = 16; // corner radius
+  const w = config.canvas.width;
+  const h = config.canvas.height ?? 675;
+  return `<rect x="${t / 2}" y="${t / 2}" width="${w - t}" height="${h - t}" fill="none" stroke="${config.colors.accent}" stroke-width="${t}" rx="${r}"/>`;
 }
 
 function createQuoteElements(
