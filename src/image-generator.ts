@@ -245,7 +245,7 @@ function createDecorativeLines(
   quoteStartY: number,
   quoteEndY: number
 ): string {
-  const t = 10;
+  const t = 20;
   const r = 16;
   const w = config.canvas.width;
   const h = config.canvas.height ?? 675;
