@@ -176,6 +176,12 @@
         <span class="error-msg" id="quoteError">引用文は必須です</span>
       </div>
 
+      <div class="field">
+        <label>Source</label>
+        <textarea id="source" placeholder="引用元（書籍名、著者名など）" rows="2"></textarea>
+        <span class="hint">改行はそのまま反映されます</span>
+      </div>
+
       <div class="divider"></div>
 
       <div class="field">
@@ -204,6 +210,7 @@
   <script>
     const form = document.getElementById('quottoForm');
     const quoteInput = document.getElementById('quote');
+    const sourceInput = document.getElementById('source');
     const outputInput = document.getElementById('output');
     const quoteError = document.getElementById('quoteError');
     const apiError = document.getElementById('apiError');
@@ -239,6 +246,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             quote,
+            source: sourceInput.value.trim() || undefined,
             output: outputInput.value.trim() || undefined,
           }),
         });

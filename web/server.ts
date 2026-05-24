@@ -32,14 +32,14 @@ Bun.serve({
 
         // Generate image API
         if (url.pathname === '/generate' && req.method === 'POST') {
-            let body: { quote?: string; title?: string; author?: string; output?: string };
+            let body: { quote?: string; title?: string; author?: string; source?: string; output?: string };
             try {
                 body = await req.json();
             } catch {
                 return Response.json({ error: 'Invalid JSON' }, { status: 400 });
             }
 
-            const { quote, title, author, output } = body;
+            const { quote, source, output } = body;
 
             if (!quote || quote.trim().length === 0) {
                 return Response.json({ error: '引用文は必須です' }, { status: 400 });
@@ -55,8 +55,8 @@ Bun.serve({
                 await generateQuoteImage(
                     {
                         quote: quote.trim(),
-                        title: title?.trim() || undefined,
-                        author: author?.trim() || undefined,
+                        title: source?.trim() || undefined,
+                        author: undefined,
                     },
                     outputPath,
                     DEFAULT_CONFIG

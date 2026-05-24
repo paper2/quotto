@@ -52,7 +52,7 @@ export const DEFAULT_CONFIG: AppConfig = {
     accent: '#2d7dd2',
     text: {
       quote: '#1a1a1a',
-      title: '#555555',
+      title: '#888888',
       author: '#888888',
       footer: '#aaaaaa',
       decorativeQuote: '#cccccc',
