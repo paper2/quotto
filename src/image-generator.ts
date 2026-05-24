@@ -436,8 +436,17 @@ export async function generateQuoteImage(
     : [];
 
   // Generate SVG elements using template functions
-  // Calculate total text block height for vertical centering
-  const totalTextHeight = calculateRequiredHeight(quoteData, fontSizes, config) - config.spacing.startY;
+  // Calculate exact text block height for vertical centering
+  const quoteBlockHeight = quoteLines.length * (quoteFontSize + config.spacing.lineGap.quote) - config.spacing.lineGap.quote;
+  const titleBlockHeight = titleLines.length > 0
+    ? config.spacing.sectionGap.afterQuote + titleLines.length * (titleFontSize + config.spacing.lineGap.title) - config.spacing.lineGap.title
+    : 0;
+  const authorBlockHeight = authorLines.length > 0
+    ? config.spacing.sectionGap.afterTitle + authorLines.length * (authorFontSize + config.spacing.lineGap.author) - config.spacing.lineGap.author
+    : 0;
+  const totalTextHeight = quoteBlockHeight + titleBlockHeight + authorBlockHeight;
+
+  const borderThickness = 20;
   const startY = config.canvas.height
     ? Math.round((canvasHeight - totalTextHeight) / 2) + quoteFontSize
     : config.spacing.startY;
