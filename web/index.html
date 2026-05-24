@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quotto — Quote Image Generator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #ffffff;
+      color: #2c3e50;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      color: #2c3e50;
+    }
+
+    .logo span { color: #3498db; }
+
+    .subtitle {
+      font-size: 14px;
+      color: #95a5a6;
+      margin-bottom: 40px;
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #7f8c8d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    label .required { color: #3498db; margin-left: 2px; }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      border: 1.5px solid #ecf0f1;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      color: #2c3e50;
+      background: #ffffff;
+      transition: border-color 0.15s;
+      outline: none;
+      resize: vertical;
+    }
+
+    textarea:focus, input[type="text"]:focus { border-color: #3498db; }
+    textarea { min-height: 100px; }
+
+    .hint { font-size: 12px; color: #bdc3c7; }
+
+    .divider { height: 1px; background: #f0f0f0; }
+
+    .submit-btn {
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .submit-btn:hover { background: #2980b9; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { background: #bdc3c7; cursor: not-allowed; transform: none; }
+
+    .error-msg {
+      font-size: 12px;
+      color: #e74c3c;
+      display: none;
+    }
+    .error-msg.visible { display: block; }
+
+    .result {
+      margin-top: 32px;
+      display: none;
+    }
+    .result.visible { display: block; }
+
+    .result-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #95a5a6;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .result img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1.5px solid #ecf0f1;
+      display: block;
+    }
+
+    .download-btn {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: 1.5px solid #ecf0f1;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: #7f8c8d;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .download-btn:hover { border-color: #3498db; color: #3498db; }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+    .submit-btn.loading .spinner { display: block; }
+    .submit-btn.loading .btn-label { opacity: 0.7; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">quot<span>to</span></div>
+    <p class="subtitle">引用文から美しい画像を生成するCLIツール</p>
+
+    <form class="form" id="quottoForm" novalidate>
+      <div class="field">
+        <label>Quote <span class="required">*</span></label>
+        <textarea id="quote" placeholder="引用文を入力してください..." rows="4"></textarea>
+        <span class="error-msg" id="quoteError">引用文は必須です</span>
+      </div>
+
+      <div class="field">
+        <label>Title</label>
+        <input type="text" id="title" placeholder="作品名・書籍名など（任意）" />
+      </div>
+
+      <div class="field">
+        <label>Author</label>
+        <input type="text" id="author" placeholder="著者名（任意）" />
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label>Output filename</label>
+        <input type="text" id="output" placeholder="output.png（省略時は自動生成）" />
+        <span class="hint">.png 形式で保存されます</span>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <div class="spinner"></div>
+        <span class="btn-label">画像を生成</span>
+      </button>
+
+      <span class="error-msg" id="apiError"></span>
+    </form>
+
+    <div class="result" id="result">
+      <div class="result-label">生成された画像</div>
+      <img id="resultImg" src="" alt="Generated quote image" />
+      <a class="download-btn" id="downloadBtn" href="" download>
+        ↓ ダウンロード
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('quottoForm');
+    const quoteInput = document.getElementById('quote');
+    const titleInput = document.getElementById('title');
+    const authorInput = document.getElementById('author');
+    const outputInput = document.getElementById('output');
+    const quoteError = document.getElementById('quoteError');
+    const apiError = document.getElementById('apiError');
+    const submitBtn = document.getElementById('submitBtn');
+    const result = document.getElementById('result');
+    const resultImg = document.getElementById('resultImg');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    quoteInput.addEventListener('input', () => {
+      if (quoteInput.value.trim()) quoteError.classList.remove('visible');
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const quote = quoteInput.value.trim();
+      if (!quote) {
+        quoteError.classList.add('visible');
+        quoteInput.focus();
+        return;
+      }
+
+      quoteError.classList.remove('visible');
+      apiError.classList.remove('visible');
+      result.classList.remove('visible');
+
+      submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
+
+      try {
+        const res = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            quote,
+            title: titleInput.value.trim() || undefined,
+            author: authorInput.value.trim() || undefined,
+            output: outputInput.value.trim() || undefined,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          apiError.textContent = data.error || '生成に失敗しました';
+          apiError.classList.add('visible');
+          return;
+        }
+
+        resultImg.src = data.url + '?t=' + Date.now();
+        downloadBtn.href = data.url;
+        downloadBtn.download = data.url.split('/').pop();
+        result.classList.add('visible');
+      } catch (err) {
+        apiError.textContent = 'サーバーへの接続に失敗しました';
+        apiError.classList.add('visible');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+      }
+    });
+  </script>
+</body>
+</html>

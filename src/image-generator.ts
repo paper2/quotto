@@ -430,16 +430,16 @@ export async function generateQuoteImage(
 
   const titleLines = quoteData.title
     ? truncateTextToMaxLines(
-        wrapText(quoteData.title, maxTextWidth, titleFontSize, config),
-        config.text.maxLines.title
-      )
+      wrapText(quoteData.title, maxTextWidth, titleFontSize, config),
+      config.text.maxLines.title
+    )
     : [];
 
   const authorLines = quoteData.author
     ? truncateTextToMaxLines(
-        wrapText(quoteData.author, maxTextWidth, authorFontSize, config),
-        config.text.maxLines.author
-      )
+      wrapText(quoteData.author, maxTextWidth, authorFontSize, config),
+      config.text.maxLines.author
+    )
     : [];
 
   // Generate SVG elements using template functions
@@ -473,7 +473,7 @@ export async function generateQuoteImage(
     decorativeLines: createDecorativeLines(
       config,
       maxTextWidth,
-      quoteResult.endY - config.spacing.sectionGap.afterQuote
+      quoteResult.endY - config.spacing.lineGap.quote
     ),
     quote: quoteResult.elements,
     title: titleResult.elements,
