@@ -20,26 +20,57 @@ import {
 } from './types';
 
 function getCharWidth(char: string): number {
-  // Check if character is full-width (Japanese, Chinese, Korean, etc.)
   const code = char.charCodeAt(0);
+  // Full-width CJK characters
   if (
     (code >= 0x3000 && code <= 0x303f) || // CJK punctuation
     (code >= 0x3040 && code <= 0x309f) || // Hiragana
     (code >= 0x30a0 && code <= 0x30ff) || // Katakana
     (code >= 0x4e00 && code <= 0x9faf) || // CJK unified ideographs
-    (code >= 0xff00 && code <= 0xffef) // Full-width ASCII
+    (code >= 0xff00 && code <= 0xffef)    // Full-width ASCII
   ) {
     return 2;
   }
   return 1;
 }
 
-function calculateTextWidth(text: string): number {
-  let width = 0;
-  for (const char of text) {
-    width += getCharWidth(char);
+// Estimate pixel width of a character at given font size (Georgia serif)
+function estimateCharPixelWidth(char: string, fontSize: number): number {
+  const code = char.charCodeAt(0);
+
+  // Full-width CJK: square characters, width ≈ fontSize
+  if (getCharWidth(char) === 2) {
+    return fontSize;
   }
-  return width;
+
+  // Space
+  if (char === ' ') return fontSize * 0.28;
+
+  // ASCII uppercase (wider letters)
+  if (code >= 0x41 && code <= 0x5a) {
+    // W, M are widest
+    if ('WM'.includes(char)) return fontSize * 0.75;
+    // I is narrowest
+    if (char === 'I') return fontSize * 0.32;
+    return fontSize * 0.62;
+  }
+
+  // ASCII lowercase
+  if (code >= 0x61 && code <= 0x7a) {
+    if ('ijlft'.includes(char)) return fontSize * 0.32;
+    if ('mw'.includes(char)) return fontSize * 0.72;
+    return fontSize * 0.55;
+  }
+
+  // Digits
+  if (code >= 0x30 && code <= 0x39) return fontSize * 0.55;
+
+  // Common punctuation
+  if ('.,;:!?'.includes(char)) return fontSize * 0.3;
+  if ('"\'()[]{}/-'.includes(char)) return fontSize * 0.35;
+
+  // Fallback for other half-width chars
+  return fontSize * 0.55;
 }
 
 export function wrapText(
@@ -48,7 +79,6 @@ export function wrapText(
   fontSize: number,
   config: AppConfig = DEFAULT_CONFIG
 ): string[] {
-  // First, split by existing newlines
   const paragraphs = text.split('\n');
   const allLines: string[] = [];
 
@@ -58,61 +88,85 @@ export function wrapText(
       continue;
     }
 
-    const chars = paragraph.split('');
+    // Tokenize: split into words (for English) and individual CJK chars
+    // A "token" is either a CJK character or a sequence of non-CJK chars (word)
+    const tokens: string[] = [];
+    let buf = '';
+    for (const char of paragraph) {
+      if (getCharWidth(char) === 2) {
+        // CJK: flush buffer, then add char as its own token
+        if (buf) { tokens.push(buf); buf = ''; }
+        tokens.push(char);
+      } else {
+        // ASCII/half-width: accumulate into word buffer, break on space
+        if (char === ' ') {
+          if (buf) { tokens.push(buf); buf = ''; }
+          tokens.push(' ');
+        } else {
+          buf += char;
+        }
+      }
+    }
+    if (buf) tokens.push(buf);
+
     let currentLine = '';
     let currentWidth = 0;
 
-    for (let i = 0; i < chars.length; i++) {
-      const char = chars[i];
-      const charWidth = getCharWidth(char);
-      const estimatedPixelWidth = charWidth * fontSize * 0.5;
+    const flushLine = () => {
+      if (currentLine) allLines.push(currentLine);
+      currentLine = '';
+      currentWidth = 0;
+    };
 
-      if (currentWidth + estimatedPixelWidth > maxWidth && currentLine) {
-        // 禁則処理: 行末禁則文字のチェック
-        let lineBreakPos = currentLine.length;
-        let moveToNext = '';
-
-        // 現在の行の最後の文字が行末禁則文字の場合
-        if (
-          config.text.kinsoku.lineEndProhibited.includes(
-            currentLine[currentLine.length - 1]
-          )
-        ) {
-          // 行末禁則文字を次の行に移動
-          lineBreakPos = currentLine.length - 1;
-          moveToNext = currentLine[currentLine.length - 1];
+    for (const token of tokens) {
+      if (token === ' ') {
+        // Add space only if line is not empty
+        if (currentLine) {
+          const spaceWidth = estimateCharPixelWidth(' ', fontSize);
+          currentLine += ' ';
+          currentWidth += spaceWidth;
         }
+        continue;
+      }
 
-        // 次の文字が行頭禁則文字の場合
-        if (config.text.kinsoku.lineStartProhibited.includes(char)) {
-          // 現在の行の最後の文字も次の行に移動
-          if (lineBreakPos > 0) {
-            lineBreakPos--;
-            moveToNext = currentLine[lineBreakPos] + moveToNext;
+      // Calculate token width
+      let tokenWidth = 0;
+      for (const c of token) {
+        tokenWidth += estimateCharPixelWidth(c, fontSize);
+      }
+
+      if (currentWidth + tokenWidth > maxWidth && currentLine) {
+        // Apply kinsoku for CJK single-char tokens
+        if (token.length === 1 && getCharWidth(token) === 2) {
+          if (config.text.kinsoku.lineStartProhibited.includes(token)) {
+            // Keep this char on current line even if it overflows slightly
+            currentLine += token;
+            currentWidth += tokenWidth;
+            flushLine();
+            continue;
+          }
+          const lastChar = currentLine[currentLine.length - 1];
+          if (config.text.kinsoku.lineEndProhibited.includes(lastChar)) {
+            // Move last char to next line
+            const moved = currentLine[currentLine.length - 1];
+            currentLine = currentLine.slice(0, -1);
+            flushLine();
+            currentLine = moved + token;
+            currentWidth = estimateCharPixelWidth(moved, fontSize) + tokenWidth;
+            continue;
           }
         }
-
-        // 行を分割
-        const finalLine = currentLine.substring(0, lineBreakPos);
-        if (finalLine) {
-          allLines.push(finalLine);
-        }
-
-        // 次の行を開始
-        currentLine = moveToNext + char;
-        currentWidth = 0;
-        for (const c of currentLine) {
-          currentWidth += getCharWidth(c) * fontSize * 0.5;
-        }
+        flushLine();
+        // If single token is wider than maxWidth, force it onto its own line
+        currentLine = token;
+        currentWidth = tokenWidth;
       } else {
-        currentLine += char;
-        currentWidth += estimatedPixelWidth;
+        currentLine += token;
+        currentWidth += tokenWidth;
       }
     }
 
-    if (currentLine) {
-      allLines.push(currentLine);
-    }
+    flushLine();
   }
 
   return allLines;
@@ -255,7 +309,7 @@ function createDecorativeLines(
 
   // Left accent line: sits between border and text, with gap
   const accentX = config.canvas.margin - 24;
-  const accentLine = `<rect x="${accentX}" y="${quoteStartY}" width="${t}" height="${quoteEndY - quoteStartY}" fill="#c8cdd2" rx="2"/>`;
+  const accentLine = `<rect x="${accentX}" y="${quoteStartY}" width="10" height="${quoteEndY - quoteStartY}" fill="#c8cdd2" rx="2"/>`;
 
   return border + accentLine;
 }
