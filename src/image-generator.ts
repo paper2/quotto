@@ -241,15 +241,24 @@ function createDecorativeQuote(_config: AppConfig): string {
 
 function createDecorativeLines(
   config: AppConfig,
-  _maxTextWidth: number,
-  _quoteStartY: number,
-  _quoteEndY: number
+  maxTextWidth: number,
+  quoteStartY: number,
+  quoteEndY: number
 ): string {
-  const t = 6; // border thickness
+  const t = 10; // border thickness
   const r = 16; // corner radius
   const w = config.canvas.width;
   const h = config.canvas.height ?? 675;
-  return `<rect x="${t / 2}" y="${t / 2}" width="${w - t}" height="${h - t}" fill="none" stroke="${config.colors.accent}" stroke-width="${t}" rx="${r}"/>`;
+
+  // Outer border: thick light gray
+  const border = `<rect x="${t / 2}" y="${t / 2}" width="${w - t}" height="${h - t}" fill="none" stroke="#d0d4d8" stroke-width="${t}" rx="${r}"/>`;
+
+  // Left accent line: aligned to left edge of centered text block
+  const textBlockLeft = (w - maxTextWidth) / 2;
+  const accentX = textBlockLeft - 16;
+  const accentLine = `<rect x="${accentX}" y="${quoteStartY}" width="4" height="${quoteEndY - quoteStartY}" fill="${config.colors.accent}" rx="2"/>`;
+
+  return border + accentLine;
 }
 
 function createQuoteElements(
@@ -260,7 +269,7 @@ function createQuoteElements(
 ): ElementResult {
   let currentY = startY;
   let elements = '';
-  const textX = config.canvas.margin + 20;
+  const textX = config.canvas.width / 2;
 
   for (const line of lines) {
     elements += `
@@ -269,7 +278,7 @@ function createQuoteElements(
             font-size="${fontSize}"
             font-family="${config.font.families.serif}"
             font-weight="bold"
-            text-anchor="start">${escapeXml(line)}</text>`;
+            text-anchor="middle">${escapeXml(line)}</text>`;
     currentY += fontSize + config.spacing.lineGap.quote;
   }
 
@@ -284,7 +293,7 @@ function createTitleElements(
 ): ElementResult {
   let currentY = startY;
   let elements = '';
-  const textX = config.canvas.margin + 20;
+  const textX = config.canvas.width / 2;
 
   for (const line of lines) {
     elements += `
@@ -292,7 +301,7 @@ function createTitleElements(
             fill="${config.colors.text.title}"
             font-size="${fontSize}"
             font-family="${config.font.families.sansSerif}"
-            text-anchor="start">${escapeXml(line)}</text>`;
+            text-anchor="middle">${escapeXml(line)}</text>`;
     currentY += fontSize + config.spacing.lineGap.title;
   }
 
@@ -307,7 +316,7 @@ function createAuthorElements(
 ): ElementResult {
   let currentY = startY;
   let elements = '';
-  const textX = config.canvas.margin + 20;
+  const textX = config.canvas.width / 2;
 
   for (const line of lines) {
     elements += `
@@ -315,7 +324,7 @@ function createAuthorElements(
             fill="${config.colors.text.author}"
             font-size="${fontSize}"
             font-family="${config.font.families.sansSerif}"
-            text-anchor="start">${escapeXml(line)}</text>`;
+            text-anchor="middle">${escapeXml(line)}</text>`;
     currentY += fontSize + config.spacing.lineGap.author;
   }
 
