@@ -6,7 +6,7 @@ export const DEFAULT_CONFIG: AppConfig = {
     height: 675,
     minHeight: 675,
     maxHeight: 675,
-    margin: 80,
+    margin: 90,
     footerHeight: 0,
   },
   font: {

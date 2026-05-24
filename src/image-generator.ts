@@ -253,8 +253,8 @@ function createDecorativeLines(
   // Outer border: blue
   const border = `<rect x="${t / 2}" y="${t / 2}" width="${w - t}" height="${h - t}" fill="none" stroke="${config.colors.accent}" stroke-width="${t}" rx="${r}"/>`;
 
-  // Left accent line: light gray, same thickness, exact quote height
-  const accentX = config.canvas.margin - 16;
+  // Left accent line: sits between border and text, with gap
+  const accentX = config.canvas.margin - 24;
   const accentLine = `<rect x="${accentX}" y="${quoteStartY}" width="${t}" height="${quoteEndY - quoteStartY}" fill="#c8cdd2" rx="2"/>`;
 
   return border + accentLine;
