@@ -5,7 +5,8 @@
   "main": "src/cli.tsx",
   "type": "module",
   "bin": {
-    "quotto": "./src/cli.tsx"
+    "quotto": "./src/cli.tsx",
+    "quotto-web": "./web/server-node.ts"
   },
   "scripts": {
     "build": "tsc",
@@ -36,6 +37,7 @@
   },
   "files": [
     "src/**/*",
+    "web/**/*",
     "LICENSE",
     "README.md"
   ],
@@ -43,7 +45,8 @@
     "commander": "^11.1.0",
     "ink": "^4.4.1",
     "react": "^18.2.0",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "tsx": "^4.22.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
