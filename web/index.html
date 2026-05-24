@@ -171,18 +171,9 @@
     <form class="form" id="quottoForm" novalidate>
       <div class="field">
         <label>Quote <span class="required">*</span></label>
-        <textarea id="quote" placeholder="引用文を入力してください..." rows="4"></textarea>
+        <textarea id="quote" placeholder="引用文を入力してください..." rows="6"></textarea>
+        <span class="hint">改行はそのまま反映されます</span>
         <span class="error-msg" id="quoteError">引用文は必須です</span>
-      </div>
-
-      <div class="field">
-        <label>Title</label>
-        <input type="text" id="title" placeholder="作品名・書籍名など（任意）" />
-      </div>
-
-      <div class="field">
-        <label>Author</label>
-        <input type="text" id="author" placeholder="著者名（任意）" />
       </div>
 
       <div class="divider"></div>
@@ -213,8 +204,6 @@
   <script>
     const form = document.getElementById('quottoForm');
     const quoteInput = document.getElementById('quote');
-    const titleInput = document.getElementById('title');
-    const authorInput = document.getElementById('author');
     const outputInput = document.getElementById('output');
     const quoteError = document.getElementById('quoteError');
     const apiError = document.getElementById('apiError');
@@ -250,8 +239,6 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             quote,
-            title: titleInput.value.trim() || undefined,
-            author: authorInput.value.trim() || undefined,
             output: outputInput.value.trim() || undefined,
           }),
         });

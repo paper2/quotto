@@ -245,7 +245,7 @@ function createDecorativeLines(
   quoteStartY: number,
   quoteEndY: number
 ): string {
-  const t = 4; // unified thickness
+  const t = 10;
   const r = 16;
   const w = config.canvas.width;
   const h = config.canvas.height ?? 675;
@@ -268,7 +268,7 @@ function createQuoteElements(
 ): ElementResult {
   let currentY = startY;
   let elements = '';
-  const textX = config.canvas.width / 2;
+  const textX = config.canvas.margin;
 
   for (const line of lines) {
     elements += `
@@ -277,7 +277,7 @@ function createQuoteElements(
             font-size="${fontSize}"
             font-family="${config.font.families.serif}"
             font-weight="bold"
-            text-anchor="middle">${escapeXml(line)}</text>`;
+            text-anchor="start">${escapeXml(line)}</text>`;
     currentY += fontSize + config.spacing.lineGap.quote;
   }
 
