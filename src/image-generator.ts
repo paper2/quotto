@@ -535,7 +535,7 @@ export async function generateQuoteImage(
       config,
       maxTextWidth,
       startY - quoteFontSize,
-      quoteResult.endY - config.spacing.lineGap.quote
+      quoteResult.endY - config.spacing.lineGap.quote - quoteFontSize
     ),
     quote: quoteResult.elements,
     title: titleResult.elements,
