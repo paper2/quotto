@@ -478,7 +478,7 @@ export async function generateQuoteImage(
     quote: quoteResult.elements,
     title: titleResult.elements,
     author: authorResult.elements,
-    footer: createFooter(config, canvasHeight),
+    footer: '',
   });
 
   const buffer = Buffer.from(svg);
