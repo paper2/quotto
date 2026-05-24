@@ -241,22 +241,21 @@ function createDecorativeQuote(_config: AppConfig): string {
 
 function createDecorativeLines(
   config: AppConfig,
-  maxTextWidth: number,
+  _maxTextWidth: number,
   quoteStartY: number,
   quoteEndY: number
 ): string {
-  const t = 10; // border thickness
-  const r = 16; // corner radius
+  const t = 4; // unified thickness
+  const r = 16;
   const w = config.canvas.width;
   const h = config.canvas.height ?? 675;
 
-  // Outer border: thick light gray
-  const border = `<rect x="${t / 2}" y="${t / 2}" width="${w - t}" height="${h - t}" fill="none" stroke="#d0d4d8" stroke-width="${t}" rx="${r}"/>`;
+  // Outer border: blue
+  const border = `<rect x="${t / 2}" y="${t / 2}" width="${w - t}" height="${h - t}" fill="none" stroke="${config.colors.accent}" stroke-width="${t}" rx="${r}"/>`;
 
-  // Left accent line: aligned to left edge of centered text block
-  const textBlockLeft = (w - maxTextWidth) / 2;
-  const accentX = textBlockLeft - 16;
-  const accentLine = `<rect x="${accentX}" y="${quoteStartY}" width="4" height="${quoteEndY - quoteStartY}" fill="${config.colors.accent}" rx="2"/>`;
+  // Left accent line: light gray, same thickness, exact quote height
+  const accentX = config.canvas.margin - 16;
+  const accentLine = `<rect x="${accentX}" y="${quoteStartY}" width="${t}" height="${quoteEndY - quoteStartY}" fill="#c8cdd2" rx="2"/>`;
 
   return border + accentLine;
 }
@@ -437,10 +436,10 @@ export async function generateQuoteImage(
     : [];
 
   // Generate SVG elements using template functions
-  // For fixed-height canvas, vertically center the text block
-  const requiredTextHeight = calculateRequiredHeight(quoteData, fontSizes, config) - config.spacing.startY;
+  // Calculate total text block height for vertical centering
+  const totalTextHeight = calculateRequiredHeight(quoteData, fontSizes, config) - config.spacing.startY;
   const startY = config.canvas.height
-    ? Math.max(config.canvas.margin, (canvasHeight - requiredTextHeight) / 2) + quoteFontSize
+    ? Math.round((canvasHeight - totalTextHeight) / 2) + quoteFontSize
     : config.spacing.startY;
   let currentY = startY;
 
