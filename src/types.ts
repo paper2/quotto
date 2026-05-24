@@ -56,6 +56,7 @@ export interface ImageGenerationOptions {
 export interface AppConfig {
   readonly canvas: {
     readonly width: number;
+    readonly height?: number;
     readonly minHeight: number;
     readonly maxHeight: number;
     readonly margin: number;

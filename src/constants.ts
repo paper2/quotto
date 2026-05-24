@@ -2,11 +2,12 @@ import type { AppConfig } from './types';
 
 export const DEFAULT_CONFIG: AppConfig = {
   canvas: {
-    width: 600,
-    minHeight: 400,
-    maxHeight: 1200,
-    margin: 60,
-    footerHeight: 50,
+    width: 1200,
+    height: 675,
+    minHeight: 675,
+    maxHeight: 675,
+    margin: 100,
+    footerHeight: 0,
   },
   font: {
     families: {
@@ -15,31 +16,31 @@ export const DEFAULT_CONFIG: AppConfig = {
     },
     sizes: {
       quote: {
-        base: 24,
-        min: 16,
+        base: 48,
+        min: 32,
       },
       title: {
-        base: 18,
-        min: 14,
+        base: 28,
+        min: 22,
       },
       author: {
-        base: 16,
-        min: 12,
+        base: 24,
+        min: 18,
       },
-      footer: 12,
-      decorativeQuote: 120,
+      footer: 0,
+      decorativeQuote: 0,
     },
     lineHeights: {
-      quote: 8,
-      title: 6,
-      author: 4,
+      quote: 16,
+      title: 10,
+      author: 8,
     },
   },
   text: {
     maxLines: {
-      quote: 15,
-      title: 6,
-      author: 3,
+      quote: 8,
+      title: 3,
+      author: 2,
     },
     kinsoku: {
       lineStartProhibited: '、。）」』！？、。．，）】｝・ゝゞ々ー～…',
@@ -47,40 +48,40 @@ export const DEFAULT_CONFIG: AppConfig = {
     },
   },
   colors: {
-    background: '#f8f9fa',
-    accent: '#3498db',
+    background: '#ffffff',
+    accent: '#2d7dd2',
     text: {
-      quote: '#2c3e50',
-      title: '#34495e',
-      author: '#7f8c8d',
-      footer: '#95a5a6',
-      decorativeQuote: '#b0b0b0',
+      quote: '#1a1a1a',
+      title: '#555555',
+      author: '#888888',
+      footer: '#aaaaaa',
+      decorativeQuote: '#cccccc',
     },
     decorative: {
-      line: '#ecf0f1',
+      line: '#eeeeee',
     },
   },
   opacity: {
-    decorativeQuote: 0.3,
-    footer: 0.7,
+    decorativeQuote: 0,
+    footer: 0,
   },
   spacing: {
-    startY: 120,
+    startY: 200,
     sectionGap: {
-      afterQuote: 40,
-      afterTitle: 20,
+      afterQuote: 48,
+      afterTitle: 24,
     },
     lineGap: {
-      quote: 8,
-      title: 6,
-      author: 4,
+      quote: 16,
+      title: 10,
+      author: 8,
     },
     decorativeLine: {
-      height: 2,
-      thickness: 1,
+      height: 0,
+      thickness: 0,
     },
     accentBar: {
-      height: 8,
+      height: 0,
     },
   },
 };

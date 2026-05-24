@@ -232,7 +232,7 @@ function escapeXml(text: string): string {
 }
 
 function createSvgBackground(_config: AppConfig, _canvasHeight: number): string {
-  return `<rect width="100%" height="100%" fill="#ffffff"/>`;
+  return `<rect width="100%" height="100%" fill="#f2f4f6"/>`;
 }
 
 function createDecorativeQuote(_config: AppConfig): string {
@@ -241,12 +241,16 @@ function createDecorativeQuote(_config: AppConfig): string {
 
 function createDecorativeLines(
   config: AppConfig,
-  _maxTextWidth: number,
+  maxTextWidth: number,
   quoteStartY: number,
   quoteEndY: number
 ): string {
-  const barHeight = quoteEndY - quoteStartY;
-  return `<rect x="${config.canvas.margin}" y="${quoteStartY}" width="3" height="${barHeight}" fill="${config.colors.accent}" rx="1.5"/>`;
+  const pad = 20;
+  const x = config.canvas.margin - pad;
+  const y = quoteStartY - config.font.sizes.quote.base * 0.3 - pad;
+  const w = maxTextWidth + pad * 2;
+  const h = (quoteEndY - quoteStartY) + config.font.sizes.quote.base * 0.3 + pad * 2;
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${config.colors.accent}" stroke-width="3" rx="8"/>`;
 }
 
 function createQuoteElements(
@@ -397,7 +401,7 @@ export async function generateQuoteImage(
 
   // Calculate required canvas height
   const requiredHeight = calculateRequiredHeight(quoteData, fontSizes, config);
-  const canvasHeight = Math.max(
+  const canvasHeight = config.canvas.height ?? Math.max(
     config.canvas.minHeight,
     Math.min(config.canvas.maxHeight, requiredHeight)
   );
@@ -425,7 +429,12 @@ export async function generateQuoteImage(
     : [];
 
   // Generate SVG elements using template functions
-  let currentY = config.spacing.startY;
+  // For fixed-height canvas, vertically center the text block
+  const requiredTextHeight = calculateRequiredHeight(quoteData, fontSizes, config) - config.spacing.startY;
+  const startY = config.canvas.height
+    ? Math.max(config.canvas.margin, (canvasHeight - requiredTextHeight) / 2) + quoteFontSize
+    : config.spacing.startY;
+  let currentY = startY;
 
   const quoteResult = createQuoteElements(
     quoteLines,
@@ -455,7 +464,7 @@ export async function generateQuoteImage(
     decorativeLines: createDecorativeLines(
       config,
       maxTextWidth,
-      config.spacing.startY - quoteFontSize,
+      startY - quoteFontSize,
       quoteResult.endY - config.spacing.lineGap.quote
     ),
     quote: quoteResult.elements,
