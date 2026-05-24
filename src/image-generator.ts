@@ -534,8 +534,8 @@ export async function generateQuoteImage(
     decorativeLines: createDecorativeLines(
       config,
       maxTextWidth,
-      startY - quoteFontSize,
-      quoteResult.endY - config.spacing.lineGap.quote - quoteFontSize
+      startY - quoteFontSize - 1,
+      quoteResult.endY - config.spacing.lineGap.quote - quoteFontSize + 1
     ),
     quote: quoteResult.elements,
     title: titleResult.elements,
