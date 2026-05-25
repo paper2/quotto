@@ -182,17 +182,9 @@
         <span class="hint">改行はそのまま反映されます</span>
       </div>
 
-      <div class="divider"></div>
-
-      <div class="field">
-        <label>Output filename</label>
-        <input type="text" id="output" placeholder="output.png（省略時は自動生成）" />
-        <span class="hint">.png 形式で保存されます</span>
-      </div>
-
       <button type="submit" class="submit-btn" id="submitBtn">
         <div class="spinner"></div>
-        <span class="btn-label">画像を生成</span>
+        <span class="btn-label">画像を生成 <span style="opacity:0.6;font-size:12px">⌘ Enter</span></span>
       </button>
 
       <span class="error-msg" id="apiError"></span>
@@ -211,7 +203,6 @@
     const form = document.getElementById('quottoForm');
     const quoteInput = document.getElementById('quote');
     const sourceInput = document.getElementById('source');
-    const outputInput = document.getElementById('output');
     const quoteError = document.getElementById('quoteError');
     const apiError = document.getElementById('apiError');
     const submitBtn = document.getElementById('submitBtn');
@@ -222,6 +213,25 @@
     quoteInput.addEventListener('input', () => {
       if (quoteInput.value.trim()) quoteError.classList.remove('visible');
     });
+
+    // Cmd+Enter to submit from anywhere
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        form.dispatchEvent(new Event('submit', { cancelable: true }));
+      }
+    });
+
+    async function copyImageToClipboard(url) {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        return true;
+      } catch {
+        return false;
+      }
+    }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -247,7 +257,6 @@
           body: JSON.stringify({
             quote,
             source: sourceInput.value.trim() || undefined,
-            output: outputInput.value.trim() || undefined,
           }),
         });
 
@@ -259,11 +268,20 @@
           return;
         }
 
-        resultImg.src = data.url + '?t=' + Date.now();
+        const imgUrl = data.url + '?t=' + Date.now();
+        resultImg.src = imgUrl;
         downloadBtn.href = data.url;
         downloadBtn.download = data.url.split('/').pop();
         result.classList.add('visible');
+
+        // Auto copy to clipboard
+        const copied = await copyImageToClipboard(imgUrl);
+        apiError.style.color = copied ? '#27ae60' : '#e74c3c';
+        apiError.textContent = copied ? '✓ クリップボードにコピーしました' : 'クリップボードへのコピーに失敗しました';
+        apiError.classList.add('visible');
+        setTimeout(() => { apiError.classList.remove('visible'); apiError.style.color = ''; }, 3000);
       } catch (err) {
+        apiError.style.color = '';
         apiError.textContent = 'サーバーへの接続に失敗しました';
         apiError.classList.add('visible');
       } finally {
