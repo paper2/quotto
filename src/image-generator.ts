@@ -288,7 +288,7 @@ function escapeXml(text: string): string {
 function createSvgBackground(config: AppConfig, canvasHeight: number): string {
   const t = 20;
   const rOuter = 28;
-  const rInner = rOuter - t;
+  const rInner = rOuter - t / 2; // inner edge radius matches visual curvature of outer border
   const w = config.canvas.width;
   const h = canvasHeight;
   // Blue filled rounded rect (outer border) + white filled inner area
