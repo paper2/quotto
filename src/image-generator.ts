@@ -285,8 +285,18 @@ function escapeXml(text: string): string {
     .replace(/'/g, '&apos;');
 }
 
-function createSvgBackground(_config: AppConfig, _canvasHeight: number): string {
-  return `<rect width="100%" height="100%" fill="#f8f9fa"/>`;
+function createSvgBackground(config: AppConfig, canvasHeight: number): string {
+  const t = 20;
+  const rOuter = 28;
+  const rInner = rOuter - t;
+  const w = config.canvas.width;
+  const h = canvasHeight;
+  // Blue filled rounded rect (outer border) + white filled inner area
+  // This avoids any SVG stroke/clip edge artifacts
+  return [
+    `<rect x="0" y="0" width="${w}" height="${h}" fill="${config.colors.accent}" rx="${rOuter}"/>`,
+    `<rect x="${t}" y="${t}" width="${w - t * 2}" height="${h - t * 2}" fill="#f8f9fa" rx="${rInner}"/>`,
+  ].join('\n');
 }
 
 function createDecorativeQuote(_config: AppConfig): string {
@@ -299,19 +309,11 @@ function createDecorativeLines(
   quoteStartY: number,
   quoteEndY: number
 ): string {
-  const t = 20;
-  const r = 16;
-  const w = config.canvas.width;
-  const h = config.canvas.height ?? 675;
-
-  // Outer border: blue
-  const border = `<rect x="${t / 2}" y="${t / 2}" width="${w - t}" height="${h - t}" fill="none" stroke="${config.colors.accent}" stroke-width="${t}" rx="${r}"/>`;
-
   // Left accent line: sits between border and text, with gap
   const accentX = config.canvas.margin - 24;
   const accentLine = `<rect x="${accentX}" y="${quoteStartY}" width="10" height="${quoteEndY - quoteStartY}" fill="#c8cdd2" rx="2"/>`;
 
-  return border + accentLine;
+  return accentLine;
 }
 
 function createQuoteElements(
