@@ -286,8 +286,8 @@ function escapeXml(text: string): string {
 }
 
 function createSvgBackground(config: AppConfig, canvasHeight: number): string {
-  const t = 20;
-  const rOuter = 28;
+  const t = 10;
+  const rOuter = 14;
   const rInner = rOuter - t / 2; // inner edge radius matches visual curvature of outer border
   const w = config.canvas.width;
   const h = canvasHeight;
@@ -310,8 +310,8 @@ function createDecorativeLines(
   quoteEndY: number
 ): string {
   // Left accent line: sits between border and text, with gap
-  const accentX = config.canvas.margin - 24;
-  const accentLine = `<rect x="${accentX}" y="${quoteStartY}" width="10" height="${quoteEndY - quoteStartY}" fill="#c8cdd2" rx="2"/>`;
+  const accentX = config.canvas.margin - 12;
+  const accentLine = `<rect x="${accentX}" y="${quoteStartY}" width="5" height="${quoteEndY - quoteStartY}" fill="#c8cdd2" rx="1"/>`;
 
   return accentLine;
 }
@@ -502,7 +502,7 @@ export async function generateQuoteImage(
     : 0;
   const totalTextHeight = quoteBlockHeight + titleBlockHeight + authorBlockHeight;
 
-  const borderThickness = 20;
+  const borderThickness = 10;
   const startY = config.canvas.height
     ? Math.round((canvasHeight - totalTextHeight) / 2) + quoteFontSize
     : config.spacing.startY;

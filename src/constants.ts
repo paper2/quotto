@@ -2,11 +2,11 @@ import type { AppConfig } from './types';
 
 export const DEFAULT_CONFIG: AppConfig = {
   canvas: {
-    width: 1200,
-    height: 675,
-    minHeight: 675,
-    maxHeight: 675,
-    margin: 90,
+    width: 600,
+    height: 335,
+    minHeight: 335,
+    maxHeight: 335,
+    margin: 45,
     footerHeight: 0,
   },
   font: {
@@ -16,24 +16,24 @@ export const DEFAULT_CONFIG: AppConfig = {
     },
     sizes: {
       quote: {
-        base: 48,
-        min: 32,
+        base: 20,
+        min: 14,
       },
       title: {
-        base: 28,
-        min: 22,
+        base: 14,
+        min: 11,
       },
       author: {
-        base: 24,
-        min: 18,
+        base: 12,
+        min: 9,
       },
       footer: 0,
       decorativeQuote: 0,
     },
     lineHeights: {
-      quote: 16,
-      title: 10,
-      author: 8,
+      quote: 8,
+      title: 5,
+      author: 4,
     },
   },
   text: {
@@ -66,15 +66,15 @@ export const DEFAULT_CONFIG: AppConfig = {
     footer: 0,
   },
   spacing: {
-    startY: 200,
+    startY: 100,
     sectionGap: {
-      afterQuote: 48,
-      afterTitle: 24,
+      afterQuote: 24,
+      afterTitle: 12,
     },
     lineGap: {
-      quote: 16,
-      title: 10,
-      author: 8,
+      quote: 8,
+      title: 5,
+      author: 4,
     },
     decorativeLine: {
       height: 0,
